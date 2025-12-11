@@ -36,7 +36,7 @@ export const tiprunData: Readable<TiprunData> = readable<TiprunData>(
     (set) => {
         async function load() {
             try {
-                const response = await fetch('/data.csv');
+                const response = await fetch('./data.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
