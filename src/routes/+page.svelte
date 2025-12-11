@@ -37,6 +37,18 @@
 		if (!weightString) return 0;
 		return parseInt(weightString, 10);
 	}
+
+	/**
+	 * ステータス文字列を記号に変換します。
+	 * @param status - 適合ステータス
+	 */
+	function getStatusSymbol(status: string | undefined): string {
+		if (!status) return '';
+		if (status === 'OK') return '〇';
+		if (status.startsWith('OK')) return '△';
+		if (status === 'NG') return '×';
+		return '?'; // '?' or other unknown statuses
+	}
 </script>
 
 <div class="bg-gray-50 min-h-screen font-sans text-gray-800">
@@ -144,13 +156,6 @@
 												合計: <span class="text-lg font-bold text-gray-900">{totalWeight}g</span>
 											</p>
 										</div>
-										<div class="flex items-center justify-between text-xs">
-											{#if annotation}
-												<p class="text-gray-500">{annotation}</p>
-											{:else}
-												<div></div>
-											{/if}
-										</div>
 									</li>
 								{/if}
 							{/each}
@@ -209,13 +214,6 @@
 											<p class="text-sm text-gray-500 text-right ml-2 flex-shrink-0">
 												合計: <span class="text-lg font-bold text-gray-900">{totalWeight}g</span>
 											</p>
-										</div>
-										<div class="flex items-center justify-between text-xs">
-											{#if annotation}
-												<p class="text-gray-500">{annotation}</p>
-											{:else}
-												<div></div>
-											{/if}
 										</div>
 									</li>
 								{/if}
@@ -293,11 +291,8 @@
 						<div class="mt-8 text-center bg-gray-50 p-6 rounded-lg border border-gray-200">
 							<h3 class="text-xl font-bold text-gray-800">適合結果</h3>
 							<p class="text-4xl font-bold my-3 {getStatusClass(checkStatus)} p-4 rounded-lg">
-								{checkStatus}
+								{getStatusSymbol(checkStatus)}
 							</p>
-							{#if annotation}
-								<p class="text-sm text-gray-600 mt-2 max-w-md mx-auto">{annotation}</p>
-							{/if}
 							{#if checkStatus.startsWith('OK')}
 								<p class="text-lg text-gray-600 mt-4">
 									合計重量: <span class="font-bold">{totalWeight}g</span>
