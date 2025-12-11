@@ -13,17 +13,14 @@
 
 	// 選択されたシンカーIDに基づいて、互換性のあるエギのリストをフィルタリングします。
 	$: compatibleEgis =
-		selectedSinkerId != null
-			? $tiprunData.egis.filter((egi) => {
-					if (selectedSinkerId === null) return false;
-					return egi.compatibility[selectedSinkerId]?.status.startsWith('OK');
-				})
+		selectedSinkerId !== null
+			? $tiprunData.egis.filter((egi) => egi.compatibility[selectedSinkerId!]?.status === 'OK')
 			: [];
 
 	// 適合確認用のステータス
 	$: checkStatus =
 		selectedEgiId !== null && selectedSinkerId !== null
-			? $tiprunData.egis[selectedEgiId]?.compatibility[selectedSinkerId]?.status
+			? selectedEgi?.compatibility[selectedSinkerId]?.status
 			: undefined;
 
 	// 適合確認用のシンカーオブジェクト
@@ -128,7 +125,7 @@
 					{#if selectedEgi}
 						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するシンカー</h3>
 						<ul class="space-y-4">
-							{#each selectedEgi.compatibility.filter( (c) => c.status.startsWith('OK') ) as comp (comp.sinkerId)}
+							{#each selectedEgi.compatibility.filter((c) => c.status === 'OK') as comp (comp.sinkerId)}
 								{@const sinker = $tiprunData.sinkers[comp.sinkerId]}
 								{#if sinker}
 									{@const totalWeight =
@@ -153,13 +150,6 @@
 											{:else}
 												<div></div>
 											{/if}
-											<p>
-												<span
-													class="px-2 py-0.5 text-xs font-semibold rounded-full {getStatusClass(
-														comp.status
-													)}">{comp.status}</span
-												>
-											</p>
 										</div>
 									</li>
 								{/if}
@@ -200,13 +190,12 @@
 						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するエギ</h3>
 						<ul class="space-y-4">
 							{#each compatibleEgis as egi (egi.id)}
-								{@const sinker = $tiprunData.sinkers.find((s) => s.id === selectedSinkerId)}
 								{@const status =
 									selectedSinkerId !== null
 										? egi.compatibility[selectedSinkerId]?.status
 										: undefined}
-								{#if sinker && status}
-									{@const totalWeight = parseWeight(egi.weight) + parseWeight(sinker.weight)}
+								{#if checkSinker && status}
+									{@const totalWeight = parseWeight(egi.weight) + parseWeight(checkSinker.weight)}
 									{@const annotation = getAnnotationText(status)}
 									<li class="bg-white rounded-lg shadow p-4">
 										<div class="flex justify-between items-start mb-2">
@@ -227,13 +216,6 @@
 											{:else}
 												<div></div>
 											{/if}
-											<p>
-												<span
-													class="px-2 py-0.5 text-xs font-semibold rounded-full {getStatusClass(
-														status
-													)}">{status}</span
-												>
-											</p>
 										</div>
 									</li>
 								{/if}
@@ -279,19 +261,25 @@
 					{#if selectedEgi || checkSinker}
 						<div class="mt-4 space-y-2">
 							{#if selectedEgi}
-								<div class="p-2 bg-gray-50 rounded-md border">
-									<p class="text-xs text-gray-500">選択中エギ:</p>
-									<p class="text-sm font-medium text-gray-800 break-words">
-										{selectedEgi.maker}
+								<div class="p-3 bg-gray-100 rounded-md border border-gray-200">
+									<p class="text-sm text-gray-600">選択中エギ:</p>
+									<p class="font-semibold text-gray-800 break-words">
+										<span
+											class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
+											>{selectedEgi.maker}</span
+										>
 										{selectedEgi.name} ({selectedEgi.weight})
 									</p>
 								</div>
 							{/if}
 							{#if checkSinker}
-								<div class="p-2 bg-gray-50 rounded-md border">
-									<p class="text-xs text-gray-500">選択中シンカー:</p>
-									<p class="text-sm font-medium text-gray-800 break-words">
-										{checkSinker.maker}
+								<div class="p-3 bg-gray-100 rounded-md border border-gray-200">
+									<p class="text-sm text-gray-600">選択中シンカー:</p>
+									<p class="font-semibold text-gray-800 break-words">
+										<span
+											class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
+											>{checkSinker.maker}</span
+										>
 										{checkSinker.name} ({checkSinker.weight})
 									</p>
 								</div>
